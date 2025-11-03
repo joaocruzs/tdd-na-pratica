@@ -15,47 +15,59 @@
     <script src="https://code.jquery.com/qunit/qunit-1.18.0.js"></script>
 
     <script>
-      function calcularTroco(precoDoProduto, valorPago) {
-        let troco = []
-        let diferenca = valorPago - precoDoProduto
-        const cedulas = [100, 50, 20, 10, 5, 2, 1]
+      const CEDULAS = [100, 50, 20, 10, 5, 2, 1];
 
-        for (let cedula of cedulas) {
-          while (diferenca >= cedula) {
-            troco.push(cedula)
-            diferenca -= cedula
-          }
+      // 🔴 Etapa RED — assinatura atualizada com o parâmetro estoque
+      function calcularTroco(precoDoProduto, valorPago, estoque) {
+        const diferenca = valorPago - precoDoProduto;
+        if (diferenca <= 0) return [];
+
+        let trocoRestante = diferenca;
+        const troco = [];
+
+        // Ainda não usamos o parâmetro 'estoque'
+        for (const cedula of CEDULAS) {
+          const quantidade = Math.floor(trocoRestante / cedula);
+          trocoRestante -= quantidade * cedula;
+          troco.push(...Array(quantidade).fill(cedula));
         }
 
-        return troco
+        return troco;
       }
     </script>
 
     <script>
       test('calcularTroco(1,1) deve retornar [] - Um array vazio', (assert) => {
-        const trocoCalculado = calcularTroco(1, 1) // Sem troco, apenas um array vazio
-        const trocoEsperado = []
-        assert.deepEqual(trocoCalculado, trocoEsperado)
-      })
+        const trocoCalculado = calcularTroco(1, 1);
+        const trocoEsperado = [];
+        assert.deepEqual(trocoCalculado, trocoEsperado);
+      });
 
       test('calcularTroco(215, 300) deve retornar [50, 20, 10, 5]', (assert) => {
-        const trocoCalculado = calcularTroco(215, 300) // Esperado um array contendo [50, 20, 10, 5]
-        const trocoEsperado = [50, 20, 10, 5]
-        assert.deepEqual(trocoCalculado, trocoEsperado)
-      })
+        const trocoCalculado = calcularTroco(215, 300);
+        const trocoEsperado = [50, 20, 10, 5];
+        assert.deepEqual(trocoCalculado, trocoEsperado);
+      });
 
       test('calcularTroco(486, 600) deve retornar [100, 10, 2, 2]', (assert) => {
-        const trocoCalculado = calcularTroco(486, 600)
-        const trocoEsperado = [100, 10, 2, 2]
-        assert.deepEqual(trocoCalculado, trocoEsperado)
-      })
+        const trocoCalculado = calcularTroco(486, 600);
+        const trocoEsperado = [100, 10, 2, 2];
+        assert.deepEqual(trocoCalculado, trocoEsperado);
+      });
       
       test('calcularTroco(12, 200) deve retornar [100, 50, 20, 10, 5, 2, 1]', (assert) => {
-        const trocoCalculado = calcularTroco(12, 200)
-        const trocoEsperado = [100, 50, 20, 10, 5, 2, 1]
-        assert.deepEqual(trocoCalculado, trocoEsperado)
-      })
-    </script>
+        const trocoCalculado = calcularTroco(12, 200);
+        const trocoEsperado = [100, 50, 20, 10, 5, 2, 1];
+        assert.deepEqual(trocoCalculado, trocoEsperado);
+      });
 
+      // Etapa RED do estoque limitado
+      test('deve calcular o troco considerando o estoque limitado', (assert) => {
+        const estoque = { 100: 1, 50: 0, 20: 5, 10: 10 };
+        const trocoCalculado = calcularTroco(220, 300, estoque);
+        const trocoEsperado = [20, 20, 20, 20];
+        assert.deepEqual(trocoCalculado, trocoEsperado);
+      });
+    </script>
   </body>
 </html>
